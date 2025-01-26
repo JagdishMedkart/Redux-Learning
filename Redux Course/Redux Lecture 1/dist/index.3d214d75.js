@@ -597,6 +597,8 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 
 },{}],"bB7Pu":[function(require,module,exports,__globalThis) {
 var _redux = require("redux");
+var _myredux = require("./myredux");
+const postCountElement = document.querySelector(".post-count");
 let initialState = {
     count: 0,
     name: "JD",
@@ -632,27 +634,40 @@ function reducer(state = initialState, action) {
             return state;
     }
 }
-store = (0, _redux.createStore)(reducer);
+store = (0, _redux.createStore)(reducer, __REDUX_DEVTOOLS_EXTENSION__());
+const myStore = (0, _myredux.myCreateStore)(reducer);
+console.log(myStore);
 console.log(store);
-store.subscribe(()=>{
-    console.log(store.getState());
+const unsubscribe = myStore.subscribe(()=>{
+    console.log(myStore.getState());
+    postCountElement.innerText = myStore.getState().count;
 });
-store.dispatch({
+myStore.subscribe(()=>{
+    console.log(myStore.getState());
+});
+postCountElement.innerText = myStore.getState().count;
+myStore.dispatch({
     type: INCREMENT
 });
-store.dispatch({
+myStore.dispatch({
     type: DECREMENT
 });
-store.dispatch({
+myStore.dispatch({
     type: INCREASE_BY,
     payload: 15
 });
-store.dispatch({
+myStore.dispatch({
     type: DECREASE_BY,
     payload: 2
 });
+// unsubscribe()
+postCountElement.addEventListener('click', ()=>{
+    store.dispatch({
+        type: INCREMENT
+    });
+});
 
-},{"redux":"anWnS"}],"anWnS":[function(require,module,exports,__globalThis) {
+},{"redux":"anWnS","./myredux":"9IZLd"}],"anWnS":[function(require,module,exports,__globalThis) {
 // src/utils/formatProdErrorMessage.ts
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -990,6 +1005,33 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}]},["ikQug","bB7Pu"], "bB7Pu", "parcelRequire94c2")
+},{}],"9IZLd":[function(require,module,exports,__globalThis) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "myCreateStore", ()=>myCreateStore);
+function myCreateStore(reducer) {
+    let state;
+    const listeners = [];
+    const store = {
+        getState () {
+            return state;
+        },
+        dispatch (action) {
+            state = reducer(state, action);
+            listeners.forEach((Listener)=>{
+                Listener();
+            });
+        },
+        subscribe (Listener) {
+            listeners.push(Listener);
+        }
+    };
+    store.dispatch({
+        type: "@@INIT"
+    });
+    return store;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"a75BS"}]},["ikQug","bB7Pu"], "bB7Pu", "parcelRequire94c2")
 
 //# sourceMappingURL=index.3d214d75.js.map
